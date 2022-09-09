@@ -1,3 +1,3 @@
 from enviropico import EnviroPico
 
-EnviroPico().bootstrap()
+system = EnviroPico().bootstrap()

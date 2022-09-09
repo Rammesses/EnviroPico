@@ -1,0 +1,41 @@
+<head>
+    <title>EnviroPico</title>
+</head>
+<body>
+        <h1><i class="fa-solid fa-seedling"></i>EnviroPico</h1>
+        <sub>The minimal environmental monitor</sub>
+        
+        <hr />
+        
+        <form action="/setup" method="post">
+            <h3>General</h3>
+            <div class="row g-2">
+                <div class="col-md">
+                    <label for="deviceName" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="deviceName" aria-describedby="deviceNameHelp">
+                    <div id="deviceNameHelp" class="form-text">This is the name that this device will use to advertise itself in Home Assistant.</div>
+                </div>
+            </div>
+
+            <h3>WiFi</h3>
+            <div class="row g-2">
+                <div class="col-md">
+                    <label for="wifiSSID" class="form-label">SSID</label>
+                    <input type="email" class="form-control" id="wifiSSID" aria-describedby="wifiSSIDHelp">
+                    <div id="wifiSSIDHelp" class="form-text">Pick which WiFi network you want to use or enter an SSID if you know it.</div>
+                </div>
+                <div class="col-md">
+                    <label for="wifiPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="wifiPassword">
+                </div>
+            </div>
+        <div class="row g-2">
+            <div class="col-md">
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+            </div>
+        </div>
+    </form>
+
+    </div>
+</body>
+
