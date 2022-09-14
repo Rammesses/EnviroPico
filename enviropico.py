@@ -1,6 +1,7 @@
 import uasyncio as asyncio
 import configuration
 import network
+import flasher
 
 from configuration import Configuration
 from configurationserver import ConfigurationServer
@@ -19,6 +20,7 @@ class EnviroPico:
     def __init__(self):
         # export stuff here!
         __all__ = ["bootstrap"]
+        self.flasher = flasher.Flasher()
         return
 
     def bootstrap(self) -> None:
@@ -48,7 +50,12 @@ class EnviroPico:
         (ip, subnet, gateway, dns) = wlan.ifconfig()
         configServer = ConfigurationServer(ip, ConfigurationServer.DEFAULT_PORT, self.isSetupMode())
 
-        asyncio.create_task(configServer.run())
+        webserver = asyncio.create_task(configServer.run())
+        flasher = asyncio.create_task(self.flasher.run())
+
+        await asyncio.gather(
+            webserver,
+            flasher)
         
     async def connect_as_ap(self) -> network.WLAN:
         # Set up AP mode
@@ -62,6 +69,8 @@ class EnviroPico:
         print("Access point active")
 
         self.wifiMode = WIFI_MODE_ACCESSPOINT
+        self.flasher.set_pattern(flasher.FLASH_AP)
+
         return ap
 
     async def connect_to_wifi(self, ssid : str, password : str) -> network.WLAN:
@@ -88,6 +97,7 @@ class EnviroPico:
             print(f'Connected to {ssid}.')
 
         self.wifiMode = WIFI_MODE_CLIENT
+        self.flasher.set_pattern(flasher.FLASH_IF)
         return wlan
 
     def isSetupMode(self):
