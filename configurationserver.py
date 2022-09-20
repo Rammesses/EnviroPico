@@ -19,26 +19,34 @@ class ConfigurationServer:
 
     async def serve(self, reader, writer):
 
-        request = await reader.readline()
-        print(f'Received request:\n{request}')
+        try:
+            request = await reader.readline()
+            print(f'Received request:\n{request}')
 
-        request = str(request)
+            request = str(request)
 
-        if (request.find('POST /setup ') >= 0):
-            print('POST setup data!')
+            if (request.find('POST /setup ') >= 0):
+                print('POST setup data!')
+                
+            if (request.find('GET / ') >- 0 or 
+                request.find('POST /setup ') >= 0):
+                response = self.get_page('index')
+            else:
+                response = "Hello Pico"
             
-        if (request.find('GET / ') >- 0 or 
-            request.find('POST /setup ') >= 0):
-            response = self.get_page('index')
-        else:
-            response = "Hello Pico"
-        
-        writer.write('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-        writer.write(response)
-        await writer.drain()
-        writer.close()
+            writer.write('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+            writer.write(response)
+            await writer.drain()
 
-        print(f'Sent response:\n{response}')
+            print(f'Sent {len(response)} bytes.')
+
+        except Exception as ex: 
+            print(ex)
+            pass # Let's just swallow any errors
+
+        finally:
+            reader.close()
+            writer.close()
 
     def get_page(self, page):
         if (self.setup_mode):
