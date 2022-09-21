@@ -1,7 +1,12 @@
 import network
 import socket
-
+import json
 import uasyncio
+
+CODE_200_OK : str = '200 OK'
+CODE_404_NOTFOUND : str = '404 NOT FOUND'
+CONTENT_TYPE_HTML : str = 'text/html'
+CONTENT_TYPE_JSON : str = 'text/json'
 
 class ConfigurationServer:
 
@@ -20,22 +25,38 @@ class ConfigurationServer:
     async def serve(self, reader, writer):
 
         try:
-            request = await reader.readline()
+            request = str(await reader.readline())
             print(f'Received request:\n{request}')
 
-            request = str(request)
+            response : str = ''
+            responseCode : str = CODE_404_NOTFOUND
+            contentType : str = CONTENT_TYPE_HTML
 
             if (request.find('POST /setup ') >= 0):
                 print('POST setup data!')
-                
-            if (request.find('GET / ') >- 0 or 
-                request.find('POST /setup ') >= 0):
+                responseCode = CODE_200_OK
+
+            elif (request.find('GET / ') >= 0):
                 response = self.get_page('index')
+                responseCode = CODE_200_OK
+
+            elif (request.find('GET /api/details ') >= 0):
+                response = self.get_details_json()
+                responseCode = CODE_200_OK
+                contentType = CONTENT_TYPE_JSON
+
+            elif (request.find('GET /api/sensors ') >= 0):
+                response = self.get_sensors_json()
+                responseCode = CODE_200_OK
+                contentType = CONTENT_TYPE_JSON
+
             else:
-                response = "Hello Pico"
+                response = ""
+                responseCode = "404 NOT FOUND"
             
-            writer.write('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+            writer.write(f'HTTP/1.0 {responseCode}\r\nContent-type: {contentType}\r\n\r\n')
             writer.write(response)
+            writer.write('\r\n\r\n')
             await writer.drain()
 
             print(f'Sent {len(response)} bytes.')
@@ -48,7 +69,7 @@ class ConfigurationServer:
             reader.close()
             writer.close()
 
-    def get_page(self, page):
+    def get_page(self, page) -> str:
         if (self.setup_mode):
             page = open(f"web/setup.html", "r")
         else:
@@ -57,3 +78,23 @@ class ConfigurationServer:
         page.close()
 
         return html
+
+    def get_details_json(self) -> str:
+
+        details = {
+            "Board ID" : "-board-id",
+            "Name" : "-name-",
+            "Network" : "-network-",
+            "IP Address" : "172.16.0.1"
+        }
+        return json.dumps(details)
+
+    def get_sensors_json(self) -> str:
+
+        sensors = {
+            "1": { "area": 'Living Room', "temp": 19.8, "humidity": 65, "pin": 4 },
+            "2": { "area": 'Kitchen', "temp": 21.6, "humidity": 66, "pin": 5 },
+            "3": { "area": 'Bathroom', "temp": 23.0, "humidity": 97, "pin": 2 }
+        }
+
+        return json.dumps(sensors)

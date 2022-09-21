@@ -10,5 +10,6 @@
     ],
     "picowgo.ftpPassword": "pico",
     "picowgo.syncFolder": "",
-    "picowgo.openOnStart": true
+    "picowgo.openOnStart": true,
+    "python.pythonPath": "/usr/local/bin/python3"
 }
