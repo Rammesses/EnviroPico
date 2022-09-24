@@ -1,0 +1,6 @@
+[
+    { "name": "Board ID", "value": "EnviroPico e6614103e748ac37" },
+    { "name": "Board Name" , "value": "Garage EnviroPico Sensor" },
+    { "name": "Network" , "value": "Perivor IoT" },
+    { "name": "IP Address", "value": "192.168.2.666" }
+]

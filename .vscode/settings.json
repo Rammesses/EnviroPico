@@ -11,5 +11,6 @@
     "picowgo.ftpPassword": "pico",
     "picowgo.syncFolder": "",
     "picowgo.openOnStart": true,
-    "python.pythonPath": "/usr/local/bin/python3"
+    "python.pythonPath": "/usr/local/bin/python3",
+    "liveServer.settings.root": "/web"
 }
