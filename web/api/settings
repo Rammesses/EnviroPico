@@ -1,0 +1,10 @@
+{
+    "boardName" : "Garage Environment Sensor",
+    "boardId" : "EnviroPico_e6614103e748ac37",
+    "wifiSSID" : "My Wifi Network",
+    "wifiPassword" : "C00lP4ssw0rd5R!",
+    "useMQTT" : "true",
+    "mqttBroker" : "mqtt.mydomain.com",
+    "mqttUsername" : "enviropico_e6614103e748ac37",
+    "mqttPassword" : "e6614103e748ac37"
+}

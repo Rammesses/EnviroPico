@@ -14,7 +14,10 @@
             <h2><span><i class="fa-solid fa-seedling"></i>EnviroPico</span></h2>
             <sub>The minimal environmental monitor</sub>
         </div>
-        <h1>Garage Environment Sensor</h1>
+        <div data-bind="with: settings">
+            <h1 data-bind="text: boardName"></h1>
+            <sub data-bind="text: boardId"></sub>
+        </div>
         <hr />
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -62,65 +65,113 @@
                         </div>
                     </div>
             </div>
-            <div class="tab-pane fade" id="pills-statistics" role="tabpanel" aria-labelledby="pills-statistics-tab">
-                Statistics goes here
-            </div>
-            <div class="tab-pane fade" id="pills-settings" role="tabpanel" aria-labelledby="pills-settings-tab">
-                <form action="/setup" method="post">
+            <div class="tab-pane fade" id="pills-settings" role="tabpanel" aria-labelledby="pills-settings-tab" data-bind="with: settings">
+                <form data-bind="submit: saveSettings">
                     <div class="shadow p-3 mb-5 bg-body rounded">
                         <h3>General</h3>
                         <div class="row g-2">
-                            <div class="col-md">
+                            <div class="col">
                                 <label for="deviceName" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="deviceName" aria-describedby="deviceNameHelp">
-                                <div id="deviceNameHelp" class="form-text">This is the name that this device will use to advertise itself in Home Assistant.</div>
+                                <input type="text" class="form-control" id="deviceName" aria-describedby="deviceNameHelp" data-bind="value: boardName">
+                                <div id="deviceNameHelp" class="form-text">This is the name that this device will use to advertise itself on the network and in Home Assistant.</div>
                             </div>
                         </div>
                     </div>
                     <div class="shadow p-3 mb-5 bg-body rounded">
                         <h3>WiFi</h3>
                         <div class="row g-2">
-                            <div class="col-md">
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" id="wifiSSID" aria-label="Text input with dropdown button">
-                                    <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&nbsp</button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#">Action</a>
-                                        <a class="dropdown-item" href="#">Another action</a>
-                                        <a class="dropdown-item" href="#">Something else here</a>
-                                        <div role="separator" class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">Separated link</a>
-                                    </div>
+                            <div class="col">
+                                <div>
+                                    <p>Click on the dropdown to pick one of the detected Wifi networks, or enter the SSID if it's a hidden network.</p>
+                                    <p>If the Enviropico cannot connect it will fall back to AP mode and advertise it's own Wifi network:</p>
+                                    <p class="text-center"><strong><span data-bind="text: boardId"></span></strong></p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <label for="wifiSSID" class="form-label">Network</label>
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" id="wifiSSID" aria-label="Text input with dropdown button" aria-describedby="wifiSSIDHelp" data-bind="value: wifiSSID">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa-solid fa-chevron-down">Choose</i></button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <!-- ko foreach: $parent.networks -->
+                                                    <li><button class="dropdown-item" type="button" data-bind="text: $data, click: function(data, event) { $parent.wifiSSID(data); }">Pick</button></li>
+                                                    <!-- /ko -->
+                                                    <!-- ko if: $parent.networks().length === 0 -->
+                                                    <li class="dropdown-item disabled"><i>No networks found.</i></li>
+                                                    <!-- /ko -->
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div id="wifiSSIDHelp" class="form-text">This is the name of the network to connect to.</div>
                                     </div>
                                 </div>
-                            <div class="col-md">
-                                <label for="wifiPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="wifiPassword">
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <label for="wifiPassword" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="wifiPassword" data-bind="value: wifiPassword">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="shadow p-3 mb-5 bg-body rounded">
                         <h3>MQTT</h3>
                         <div class="row g-2">
-                            <div class="col-md">
-                                <input type="checkbox" class="form-check-input" id="useMQTT">
-                                <label class="form-check-label" for="exampleCheck1">Send data to an MQTT broker</label>
+                            <div class="col">
+                                <label for="useMQTT" class="form-label">Use MQTT?</label>&nbsp;
+                                <input type="checkbox" class="form-check-input" id="useMQTT" data-bind="checked: useMQTT" >
+                                <label class="form-check-label" for="useMQTT">Check to send data to an MQTT broker</label>
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col">
+                                <label for="mqttBroker" class="form-label">Broker</label>
+                                <input type="text" class="form-control" id="mqttBroker" aria-describedby="mqttBrokerHelp" data-bind="value: mqttBroker, enable: useMQTT">
+                                <div id="mmqttBrokerHelp" class="form-text">This is the DNS name or IP address of the MQTT broker to connect to.</div>
+                            </div>
+                            <div class="col">
+                                <label for="mqttUsername" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="mqttUsername" aria-describedby="mqttUsernameHelp" data-bind="value: mqttUsername, enable: useMQTT">
+                                <div id="mqttUsernameHelp" class="form-text">This is the username to use when connecting to the MQTT broker.</div>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col">
+                            </div>
+                            <div class="col">
+                                <label for="mqttPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="mqttPassword" aria-describedby="mqttPassworddHelp" data-bind="value: mqttPassword, enable: useMQTT">
+                                <div id="mqttPasswordHelp" class="form-text">This is password to use when connectting to the MQTT broker.</div>
                             </div>
                         </div>
                     </div>
                     <div class="row g-2">
-                        <div class="col-md">
+                        <div class="col">
                             <button type="submit" class="btn btn-primary">Save Settings</button>
                         </div>
                     </div>
-            </form>
+                </form>
             </div>
           </div>
     </div>
 
     <script type="text/javascript">
 
+        function Settings(source)
+        {
+            this.boardName = ko.observable(source.boardName);
+            this.boardId = ko.observable(source.boardId);
+            this.wifiSSID = ko.observable(source.wifiSSID);
+            this.wifiPassword = ko.observable(source.wifiPassword);
+            this.useMQTT = ko.observable(source.useMQTT);
+            this.mqttBroker = ko.observable(source.mqttBroker);
+            this.mqttUsername = ko.observable(source.mqttUsername);
+            this.mqttPassword = ko.observable(source.mqttPassword);
+        }
 
         function Sensor(sensor_id, area, temp, humidity, pin) {
             this.sensor_id = ko.observable(sensor_id);
@@ -138,25 +189,59 @@
         function ViewModel() {
             this.details = ko.observableArray();
             this.sensorList = ko.observableArray();
+            this.networks = ko.observableArray();
+            this.settings = ko.observable();
         }        
 
+        var viewmodel = new ViewModel();
+
         function LoadData() {
-            var viewmodel = new ViewModel();
-            ko.applyBindings(viewmodel);
+            ko.applyBindings(viewmodel);        
 
-           
-            viewmodel.sensorList.push(new Sensor('1', 'Living Room', '21.6', '65', '4'));
-            viewmodel.sensorList.push(new Sensor('2', 'Kitchen', '19.8', '66', '5'));
-            viewmodel.sensorList.push(new Sensor('3', 'Bathroom', '23.0', '97', '2'));
-
-
+            loadBoardDetails(viewmodel);
+            loadSensorData(viewmodel);
+            loadSettings(viewmodel);
+            loadSNetworks(viewmodel);
+        }
+        
+        function loadBoardDetails(viewmodel) {
             console.log("getting details from /api/details...");
             $.getJSON("/api/details", function(details) {
-                console.log("retrieved details..." + details);
+                console.log("retrieved details..." + JSON.stringify(details, null, 4));
                 viewmodel.details(details);
             });
         }
-        
+
+        function loadSensorData(viewmodel) {
+            console.log("getting sensor data from /api/sensors...");
+            $.getJSON("/api/sensors", function(sensors) {
+                console.log("retrieved sensor data..." + JSON.stringify(sensors, null, 4));
+                viewmodel.sensorList(sensors);
+            });
+        }
+
+        function loadSettings(viewmodel)
+        {
+            console.log("getting settings from /api/settings...");
+            $.getJSON("/api/settings", function(settings) {
+                console.log("retrieved settings... " + JSON.stringify(settings, null, 4));
+                viewmodel.settings(new Settings(settings));
+            })
+        }
+
+        function loadSNetworks(viewmodel)
+        {
+            console.log("getting available networks from /api/networks...");
+            $.getJSON("/api/networks", function(networks) {
+                console.log("retrieved networks... " + JSON.stringify(networks, null, 4));
+                viewmodel.networks(networks);
+            })
+        }
+
+        function saveSettings(formData) {
+            console.log('saving settings via /api/settings...');
+        }
+
         window.addEventListener('DOMContentLoaded', (event) => {
             LoadData();
         });

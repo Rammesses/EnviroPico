@@ -1,0 +1,5 @@
+[
+    { "sensor_id": 1, "area": "Living Room", "temp": 19.8, "humidity": 65, "pin": 4 },
+    { "sensor_id": 2, "area": "Kitchen", "temp": 21.6, "humidity": 66, "pin": 5 },
+    { "sensor_id": 3, "area": "Bathroom", "temp": 23.0, "humidity": 97, "pin": 2 }
+]
