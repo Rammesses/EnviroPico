@@ -45,6 +45,11 @@ class ConfigurationServer:
                 responseCode = CODE_200_OK
                 contentType = CONTENT_TYPE_JSON
 
+            elif (request.find('GET /api/networks ') >= 0):
+                response = self.get_networks_json()
+                responseCode = CODE_200_OK
+                contentType = CONTENT_TYPE_JSON
+
             elif (request.find('GET /api/sensors ') >= 0):
                 response = self.get_sensors_json()
                 responseCode = CODE_200_OK
@@ -81,20 +86,30 @@ class ConfigurationServer:
 
     def get_details_json(self) -> str:
 
-        details = {
-            "Board ID" : "-board-id",
-            "Name" : "-name-",
-            "Network" : "-network-",
-            "IP Address" : "172.16.0.1"
-        }
+        details = [
+            { "name": "Board ID", "value" : "-board-id" },
+            { "name": "Board Name", "value" : "-name-" },
+            { "name": "Network", "value" : "-network-" },
+            { "name": "IP Address", "value" : "172.16.0.1" }
+        ]
         return json.dumps(details)
+
+    def get_networks_json(self) -> str:
+
+        networks = [
+            "BT_123456",
+            "VM-65431",
+            "My Wifi Network",
+            "Another Wifi Network",
+            "DANGER, WILL ROBIMSON!"
+        ]
+        return json.dumps(networks);
 
     def get_sensors_json(self) -> str:
 
-        sensors = {
-            "1": { "area": 'Living Room', "temp": 19.8, "humidity": 65, "pin": 4 },
-            "2": { "area": 'Kitchen', "temp": 21.6, "humidity": 66, "pin": 5 },
-            "3": { "area": 'Bathroom', "temp": 23.0, "humidity": 97, "pin": 2 }
-        }
-
+        sensors = [
+            { "sensor_id": 1, "area": "Living Room", "temp": 19.8, "humidity": 65, "pin": 4 },
+            { "sensor_id": 2, "area": "Kitchen", "temp": 21.6, "humidity": 66, "pin": 5 },
+            { "sensor_id": 3, "area": "Bathroom", "temp": 23.0, "humidity": 97, "pin": 2 }
+        ]
         return json.dumps(sensors)
